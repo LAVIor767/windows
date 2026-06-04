@@ -1,0 +1,2123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Stock Market Analyzer | Technical Indicators & Market Data</title>
+
+<link rel="icon"
+href="/static/images/favicon.png"
+type="image/png">
+
+<meta name="description"
+content="Real-time stock analysis dashboard showing current price, daily high and low, and mathematical indicators based on historical data to predict short and long-term trends.">
+
+<meta name="keywords"
+content="stocks, stock analysis, technical indicators, stock predictions, market data">
+
+<meta name="author"
+content="Stock Viewer">
+
+<!-- Google Analytics -->
+
+<script async
+src="https://www.googletagmanager.com/gtag/js?id=G-YS2QS3NW3F">
+</script>
+
+<script>
+
+window.dataLayer = window.dataLayer || [];
+
+function gtag(){
+dataLayer.push(arguments);
+}
+
+gtag('js', new Date());
+
+gtag('config', 'G-YS2QS3NW3F');
+
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* =========================
+   RESET
+========================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+
+    font-family:'Inter',sans-serif;
+
+    background:
+    radial-gradient(circle at top left,#172554 0%,#020617 40%),
+    radial-gradient(circle at bottom right,#0f172a 0%,#020617 50%);
+
+    background-color:#020617;
+
+    color:white;
+
+    min-height:100vh;
+
+    overflow-x:hidden;
+}
+
+/* =========================
+   BACKGROUND GLOW
+========================= */
+
+.bg-glow-1{
+
+    position:fixed;
+
+    width:400px;
+    height:400px;
+
+    border-radius:50%;
+
+    background:#2563eb;
+
+    filter:blur(120px);
+
+    opacity:0.18;
+
+    top:-120px;
+    left:-120px;
+
+    z-index:-1;
+}
+
+.bg-glow-2{
+
+    position:fixed;
+
+    width:350px;
+    height:350px;
+
+    border-radius:50%;
+
+    background:#06b6d4;
+
+    filter:blur(120px);
+
+    opacity:0.12;
+
+    bottom:-100px;
+    right:-100px;
+
+    z-index:-1;
+}
+
+/* =========================
+   CONTAINER
+========================= */
+
+.container{
+
+    width:94%;
+
+    max-width:1300px;
+
+    margin:auto;
+
+    padding:24px;
+}
+
+/* =========================
+   TOP BAR
+========================= */
+
+.topbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-top:10px;
+}
+
+.logo{
+
+    font-size:24px;
+
+    font-weight:900;
+
+    letter-spacing:-1px;
+
+    background:
+    linear-gradient(to right,#38bdf8,#818cf8);
+
+    -webkit-background-clip:text;
+
+    -webkit-text-fill-color:transparent;
+}
+
+.market-status{
+
+    padding:10px 16px;
+
+    border-radius:999px;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    backdrop-filter:blur(12px);
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    background:rgba(255,255,255,0.05);
+}
+
+.market-open{
+
+    color:#4ade80;
+}
+
+.market-closed{
+
+    color:#f87171;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+
+    margin-top:50px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-align:center;
+}
+
+.hero-badge{
+
+    padding:10px 18px;
+
+    border-radius:999px;
+
+    background:rgba(255,255,255,0.06);
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    backdrop-filter:blur(12px);
+
+    font-size:13px;
+
+    color:#cbd5e1;
+}
+
+.hero-title{
+
+    margin-top:28px;
+
+    font-size:62px;
+
+    font-weight:900;
+
+    line-height:1;
+
+    letter-spacing:-3px;
+
+    background:
+    linear-gradient(to bottom,#ffffff,#94a3b8);
+
+    -webkit-background-clip:text;
+
+    -webkit-text-fill-color:transparent;
+}
+
+.hero-subtitle{
+
+    margin-top:22px;
+
+    max-width:650px;
+
+    color:#94a3b8;
+
+    line-height:1.8;
+
+    font-size:18px;
+}
+
+/* =========================
+   HERO IMAGE
+========================= */
+
+.hero-image-wrapper{
+
+    margin-top:45px;
+
+    width:100%;
+
+    max-width:480px;
+
+    position:relative;
+}
+
+.hero-image{
+
+    width:100%;
+
+    border-radius:36px;
+
+    overflow:hidden;
+
+    border:1px solid rgba(255,255,255,0.1);
+
+    box-shadow:
+    0 0 50px rgba(59,130,246,0.25),
+    0 0 120px rgba(59,130,246,0.12);
+
+    transform:perspective(1200px)
+    rotateX(4deg);
+
+    transition:0.5s ease;
+}
+
+.hero-image:hover{
+
+    transform:
+    perspective(1200px)
+    rotateX(0deg)
+    scale(1.02);
+}
+
+/* =========================
+   FORM
+========================= */
+
+.stock-form{
+
+    margin-top:55px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:16px;
+}
+
+.stock-select{
+
+    width:100%;
+
+    padding:20px;
+
+    border:none;
+
+    outline:none;
+
+    border-radius:24px;
+
+    font-size:16px;
+
+    color:white;
+
+    background:
+    rgba(255,255,255,0.06);
+
+    backdrop-filter:blur(12px);
+
+    border:1px solid rgba(255,255,255,0.08);
+}
+
+.stock-button{
+
+    width:100%;
+
+    padding:20px;
+
+    border:none;
+
+    border-radius:24px;
+
+    cursor:pointer;
+
+    font-size:17px;
+
+    font-weight:800;
+
+    color:white;
+
+    background:
+    linear-gradient(135deg,#2563eb,#06b6d4);
+
+    box-shadow:
+    0 10px 30px rgba(37,99,235,0.3);
+}
+
+.stock-button:hover{
+
+    transform:translateY(-3px);
+}
+
+/* =========================
+   DASHBOARD
+========================= */
+
+.dashboard{
+
+    margin-top:40px;
+}
+
+/* =========================
+   SUMMARY CARDS
+========================= */
+
+.summary-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(160px,1fr));
+
+    gap:18px;
+}
+
+.summary-card{
+
+    background:
+    rgba(255,255,255,0.05);
+
+    backdrop-filter:blur(14px);
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    border-radius:30px;
+
+    padding:24px;
+}
+
+.summary-label{
+
+    font-size:13px;
+
+    color:#94a3b8;
+}
+
+.summary-value{
+
+    margin-top:12px;
+
+    font-size:34px;
+
+    font-weight:800;
+
+    letter-spacing:-1px;
+}
+
+/* =========================
+   SIGNAL BOX
+========================= */
+
+.signal-box{
+
+    margin-top:28px;
+
+    background:
+    linear-gradient(
+    145deg,
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.04));
+
+    backdrop-filter:blur(16px);
+
+    border-radius:36px;
+
+    padding:30px;
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    box-shadow:
+    0 20px 40px rgba(0,0,0,0.35);
+}
+
+.signal-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+}
+
+.signal-badge{
+
+    padding:8px 14px;
+
+    border-radius:999px;
+
+    background:rgba(255,255,255,0.06);
+
+    font-size:12px;
+
+    color:#cbd5e1;
+}
+
+.signal-main{
+
+    margin-top:20px;
+}
+
+.signal-title{
+
+    font-size:62px;
+
+    font-weight:900;
+
+    letter-spacing:-2px;
+}
+
+.buy{
+    color:#4ade80;
+}
+
+.sell{
+    color:#f87171;
+}
+
+.neutral{
+    color:#facc15;
+}
+
+.signal-confidence{
+
+    margin-top:14px;
+
+    font-size:18px;
+
+    color:#cbd5e1;
+}
+
+/* =========================
+   AI POWER SCORE
+========================= */
+
+.ai-power-wrap{
+
+    position:relative;
+
+    margin-top:28px;
+    margin-bottom:22px;
+}
+
+.ai-power-glow{
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+    radial-gradient(circle,
+    rgba(56,189,248,0.35) 0%,
+    rgba(59,130,246,0.05) 60%,
+    transparent 100%);
+
+    filter:blur(35px);
+
+    border-radius:40px;
+
+    z-index:0;
+}
+
+.ai-power-card{
+
+    position:relative;
+
+    z-index:1;
+
+    overflow:hidden;
+
+    border-radius:34px;
+
+    padding:28px;
+
+    background:
+    linear-gradient(
+    135deg,
+    rgba(15,23,42,0.95),
+    rgba(30,41,59,0.92));
+
+    border:
+    1px solid rgba(255,255,255,0.08);
+
+    box-shadow:
+    0 10px 40px rgba(0,0,0,0.35),
+    0 0 40px rgba(59,130,246,0.18);
+}
+
+.ai-power-top{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+}
+
+.ai-power-badge{
+
+    font-size:13px;
+
+    font-weight:800;
+
+    letter-spacing:1.5px;
+
+    color:#38bdf8;
+}
+
+.ai-power-live{
+
+    padding:6px 12px;
+
+    border-radius:999px;
+
+    background:
+    rgba(34,197,94,0.15);
+
+    border:
+    1px solid rgba(74,222,128,0.25);
+
+    color:#4ade80;
+
+    font-size:11px;
+
+    font-weight:800;
+
+    letter-spacing:1px;
+}
+
+.ai-power-score{
+
+    margin-top:22px;
+
+    font-size:82px;
+
+    font-weight:900;
+
+    line-height:1;
+
+    letter-spacing:-3px;
+
+    background:
+    linear-gradient(
+    to bottom,
+    #ffffff,
+    #7dd3fc);
+
+    -webkit-background-clip:text;
+
+    -webkit-text-fill-color:transparent;
+
+    overflow-wrap:anywhere;
+
+    word-break:break-word;
+}
+
+.ai-power-score span{
+
+    font-size:32px;
+
+    white-space:nowrap;
+}
+
+.ai-power-desc{
+
+    margin-top:14px;
+
+    color:#94a3b8;
+
+    font-size:15px;
+
+    letter-spacing:0.3px;
+}
+
+/* =========================
+   PROGRESS BAR
+========================= */
+
+.progress{
+    margin-top:12px;
+
+    width:100%;
+
+    height:12px;
+
+    background:
+    rgba(255,255,255,0.08);
+
+    border-radius:999px;
+
+    overflow:hidden;
+}
+
+.progress-fill{
+
+    height:100%;
+
+    width:78%;
+
+    border-radius:999px;
+
+    background:
+    linear-gradient(to right,#22c55e,#4ade80);
+}
+
+/* =========================
+   ADX BAR
+========================= */
+
+.adx-progress-fill{
+
+    height:100%;
+
+    border-radius:999px;
+
+    background:
+    linear-gradient(
+    to right,
+    #f97316,
+    #fb923c
+    );
+
+    transition:width .4s ease;
+}
+
+/* =========================
+   INDICATORS
+========================= */
+
+.section-title{
+
+    margin-top:40px;
+
+    font-size:26px;
+
+    font-weight:800;
+
+    letter-spacing:-1px;
+}
+
+.indicators-grid{
+
+    margin-top:22px;
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(160px,1fr));
+
+    gap:16px;
+}
+
+.indicator-card{
+
+    background:
+    rgba(255,255,255,0.05);
+
+    border-radius:28px;
+
+    padding:22px;
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    backdrop-filter:blur(12px);
+}
+
+.indicator-card:hover{
+
+    transform:translateY(-4px);
+}
+
+.indicator-name{
+
+    color:#94a3b8;
+
+    font-size:13px;
+}
+
+.indicator-value{
+
+    margin-top:12px;
+
+    font-size:32px;
+
+    font-weight:800;
+
+    letter-spacing:-1px;
+}
+
+/* =========================
+SIGNAL STATS GRID
+========================= */
+
+.signal-stats-grid{
+
+    margin-top:28px;
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(140px,1fr));
+
+    gap:16px;
+}
+
+.signal-stat-card{
+
+    background:
+    rgba(255,255,255,0.05);
+
+    border-radius:22px;
+
+    padding:18px;
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    backdrop-filter:blur(12px);
+}
+
+.signal-stat-label{
+
+    color:#94a3b8;
+
+    font-size:13px;
+}
+
+.signal-stat-value{
+
+    margin-top:10px;
+
+    font-size:24px;
+
+    font-weight:800;
+
+    letter-spacing:-1px;
+}
+
+/* =========================
+TIMEFRAME ANALYSIS
+========================= */
+
+.timeframe-grid{
+
+    margin-top:24px;
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(260px,1fr));
+
+    gap:20px;
+}
+
+.tf-card{
+
+    background:
+    rgba(255,255,255,0.05);
+
+    border-radius:28px;
+
+    padding:24px;
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    backdrop-filter:blur(14px);
+
+    box-shadow:
+    0 10px 30px rgba(0,0,0,0.2);
+}
+
+.tf-title{
+
+    font-size:22px;
+
+    font-weight:800;
+
+    margin-bottom:20px;
+}
+
+.tf-stat{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:12px 0;
+
+    border-bottom:
+    1px solid rgba(255,255,255,0.06);
+}
+
+.tf-stat:last-child{
+
+    border-bottom:none;
+}
+
+.tf-stat span{
+
+    color:#94a3b8;
+
+    font-size:14px;
+}
+
+.tf-stat b{
+
+    font-size:18px;
+
+    font-weight:800;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+
+    margin-top:80px;
+
+    padding-bottom:40px;
+
+    text-align:center;
+
+    color:#64748b;
+
+    line-height:2;
+}
+
+/* =========================
+   LOADER
+========================= */
+
+.loader{
+
+    position:fixed;
+
+    inset:0;
+
+    background:
+    rgba(2,6,23,0.92);
+
+    z-index:9999;
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    flex-direction:column;
+
+    gap:25px;
+}
+
+.loader-circle{
+
+    width:80px;
+    height:80px;
+
+    border-radius:50%;
+
+    border:5px solid rgba(255,255,255,0.08);
+
+    border-top:5px solid #38bdf8;
+
+    animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:768px){
+
+    .hero-title{
+
+        font-size:42px;
+
+        letter-spacing:-2px;
+    }
+
+    .hero-subtitle{
+
+        font-size:16px;
+    }
+
+    .signal-title{
+
+        font-size:42px;
+    }
+
+    .summary-value{
+
+        font-size:28px;
+    }
+
+    .indicator-value{
+
+        font-size:26px;
+    }
+
+    .ai-power-score{
+
+        font-size:clamp(42px,11vw,58px);
+
+        letter-spacing:-2px;
+    }
+
+    .ai-power-score span{
+
+    font-size:28px;
+    }
+}
+
+@media(max-width:768px){
+
+    .signal-box,
+    .summary-card,
+    .indicator-card,
+    .tf-card,
+    .market-status{
+
+        backdrop-filter:none;
+
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="bg-glow-1"></div>
+<div class="bg-glow-2"></div>
+
+<!-- LOADER -->
+
+<div class="loader" id="loader">
+
+<div class="loader-circle"></div>
+
+<div style="font-size:22px;font-weight:700;">
+Analyzing Market...
+</div>
+
+</div>
+
+<div class="container">
+
+<!-- TOPBAR -->
+
+<div class="topbar">
+
+<div class="logo">
+StocksAI
+</div>
+
+{% if market.is_open %}
+
+<div class="market-status market-open">
+● MARKET OPEN
+</div>
+
+{% else %}
+
+<div class="market-status market-closed">
+● MARKET CLOSED
+</div>
+
+{% endif %}
+
+</div>
+
+<!-- HERO -->
+
+{% if not stock_data %}
+
+<div class="hero">
+
+<div class="hero-badge">
+AI Powered Trading Intelligence
+</div>
+
+<div class="hero-title">
+Professional Stocks Analysis Wizard
+</div>
+
+<div class="hero-subtitle">
+
+Real-time AI signals, advanced indicators,
+multi-timeframe analysis and institutional-grade
+market insights.
+
+</div>
+
+<div class="hero-image-wrapper">
+
+<a href="{{ url_for('mavohim') }}">
+
+<img
+src="{{ url_for('static', filename='images/roulette.jpg') }}"
+class="hero-image"
+alt="AI Trading Dashboard">
+
+</a>
+
+</div>
+
+</div>
+
+{% endif %}
+
+<!-- FORM -->
+
+<form method="POST" class="stock-form">
+
+<select
+name="stock"
+class="stock-select">
+
+{% for name,symbol in stocks.items() %}
+
+<option value="{{ name }}">
+
+{{ name }}
+
+</option>
+
+{% endfor %}
+
+</select>
+
+<button
+type="submit"
+class="stock-button">
+
+Analyze Stock
+
+</button>
+
+</form>
+
+<!-- DASHBOARD -->
+
+{% if stock_data %}
+
+<div class="dashboard">
+
+<!-- SUMMARY -->
+
+<div class="summary-grid">
+
+<div class="summary-card">
+
+<div style="
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:10px;
+gap:10px;
+">
+
+<div style="
+font-size:15px;
+font-weight:700;
+color:#cbd5e1;
+">
+
+{{ stock_data.Name }}
+
+</div>
+
+<div style="
+padding:4px 10px;
+border-radius:999px;
+background:rgba(255,255,255,0.08);
+border:1px solid rgba(255,255,255,0.06);
+font-size:12px;
+font-weight:800;
+color:#38bdf8;
+letter-spacing:1px;
+">
+
+{{ stock_data.Symbol }}
+
+</div>
+
+</div>
+
+<div class="summary-label">
+Current Price
+</div>
+
+<div class="summary-value" id="price">
+${{ "%.2f"|format(stock_data['Price']) }}
+</div>
+</div>
+
+<div class="summary-card">
+
+<div class="summary-label">
+Day High
+</div>
+
+<div class="summary-value" id="day-high">
+${{ "%.2f"|format(stock_data['Day High']) }}
+</div>
+</div>
+
+<div class="summary-card">
+
+<div class="summary-label">
+Day Low
+</div>
+
+<div class="summary-value" id="day-low">
+${{ "%.2f"|format(stock_data['Day Low']) }}
+</div>
+
+</div>
+
+<div class="summary-card">
+
+    <div class="summary-label">
+        Previous Close
+    </div>
+
+    <div class="summary-value" id="previous-close">
+        ${{ "%.2f"|format(stock_data['Previous Close']) }}
+    </div>
+
+</div>
+
+</div>
+
+<!-- SIGNAL -->
+
+<!-- =========================
+AI SIGNAL ADVANCED BOX
+========================= -->
+
+{% if combined_signal %}
+
+<div class="signal-box">
+
+    <!-- HEADER -->
+
+    <div class="signal-header">
+
+        <div>
+
+            <div style="
+            font-size:14px;
+            color:#94a3b8;
+            font-weight:600;">
+
+                AI MARKET SIGNAL
+
+            </div>
+
+            <div
+            id="signal-text"
+
+            class="signal-title
+            {% if combined_signal.signal in ['BUY','STRONG BUY'] %}
+            buy
+            {% elif combined_signal.signal in ['SELL','STRONG SELL'] %}
+            sell
+            {% else %}
+            neutral
+            {% endif %}
+            ">
+
+                {{ combined_signal.signal }}
+
+            </div>
+
+        </div>
+
+        <div class="signal-badge">
+
+            {{ combined_signal.market_state }}
+
+        </div>
+
+    </div>
+
+    <!-- CONFIDENCE -->
+
+<!-- AI POWER SCORE -->
+
+    <div class="ai-power-wrap">
+
+        <div class="ai-power-glow"></div>
+
+        <div class="ai-power-card">
+
+            <div class="ai-power-top">
+
+                <div class="ai-power-badge">
+                    ⚡ AI POWER SCORE
+                </div>
+
+                <div class="ai-power-live">
+                    LIVE
+                </div>
+
+            </div>
+
+            <div
+            class="ai-power-score"
+            id="ai-power-score">
+
+                {{ combined_signal.score }}
+
+                <span>/100</span>
+
+            </div>
+
+            <div class="ai-power-desc">
+
+                Institutional AI Market Strength
+
+            </div>
+
+            </div>
+
+    </div>
+
+        <div class="signal-confidence">
+
+        Confidence:
+            <b id="confidence-text">
+                {{ combined_signal.confidence }}%
+            </b>
+
+        </div>
+
+<!-- PROGRESS -->
+
+        <div class="progress">
+
+            <div
+            id="confidence-bar"
+
+            class="progress-fill"
+            style="width:{{ combined_signal.confidence }}%;">
+            </div>
+
+        </div>
+
+<!-- ADX -->
+
+        <div class="signal-confidence">
+
+            ADX Strength:
+            <b id="adx-text">
+                {{ combined_signal.adx }}%
+            </b>
+
+        </div>
+
+        <div class="progress">
+
+            <div
+            id="adx-bar"
+            class="adx-progress-fill"
+            style="width:{{ combined_signal.adx }}%;">
+            </div>
+
+        </div>
+
+<!-- STATS GRID -->
+
+        <div class="signal-stats-grid">
+
+            <div class="signal-stat-card">
+
+                <div class="signal-stat-label">
+                    Momentum
+                </div>
+
+            <div
+            class="signal-stat-value"
+            id="momentum-text">
+
+                {{ combined_signal.momentum }}
+
+            </div>
+
+        </div>
+
+        <div class="signal-stat-card">
+
+            <div class="signal-stat-label">
+                Trend
+            </div>
+
+            <div
+            class="signal-stat-value"
+            id="trend-text">
+
+                {{ combined_signal.trend }}
+
+            </div>
+
+        </div>
+
+        <div class="signal-stat-card">
+
+            <div class="signal-stat-label">
+                Volatility
+            </div>
+
+            <div
+            class="signal-stat-value"
+            id="volatility-text">
+
+                {{ combined_signal.volatility }}
+
+            </div>
+
+        </div>
+
+        <div class="signal-stat-card">
+
+            <div class="signal-stat-label">
+                Agreement
+            </div>
+
+           <div
+           class="signal-stat-value"
+           id="agreement-text">
+
+               {{ combined_signal.agreement }}
+
+            </div>
+
+        </div>
+
+                <div class="signal-stat-card">
+
+            <div class="signal-stat-label">
+                Consensus
+            </div>
+
+           <div
+           class="signal-stat-value"
+           id="consensus-text">
+
+               {{ combined_signal.consensus }}
+
+            </div>
+
+        </div>
+
+        <div class="signal-stat-card">
+
+            <div class="signal-stat-label">
+                Market State
+            </div>
+
+            <div class="signal-stat-value"
+            style="font-size:18px;">
+
+                <span id="market-state-text">
+                    {{ combined_signal.market_state }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+<!-- INDICATORS -->
+
+<!-- =========================
+DAILY INDICATORS
+========================= -->
+
+{% if calc_result %}
+
+<div class="section-title">
+Daily Indicators (1 Day)
+</div>
+
+<div class="indicators-grid">
+
+{% for key,value in calc_result.items() %}
+
+<div class="indicator-card">
+
+    <div class="indicator-name">
+
+        {{ key
+            .replace('_1D','')
+            .replace('_1H','')
+            .replace('_5M','')
+            .replace('_',' ')
+            .replace('[12,26]','')
+        }}
+
+    </div>
+
+    <div
+    class="indicator-value"
+    id="daily-{{ key }}">
+
+        {{ value }}
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endif %}
+
+<!-- =========================
+1H INDICATORS
+========================= -->
+
+{% if hourly_result %}
+
+<div class="section-title">
+Intraday Indicators<br>(1 Hour)
+</div>
+
+<div class="indicators-grid">
+
+{% for key,value in hourly_result.items() %}
+
+<div class="indicator-card">
+
+    <div class="indicator-name">
+
+        {{ key
+            .replace('_1D','')
+            .replace('_1H','')
+            .replace('_5M','')
+            .replace('_',' ')
+            .replace('[12,26]','')
+        }}
+
+    </div>
+
+    <div
+    class="indicator-value"
+    id="hourly-{{ key }}">
+
+        {{ value }}
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endif %}
+
+<!-- =========================
+5M INDICATORS
+========================= -->
+
+{% if five_min_result %}
+
+<div class="section-title">
+Indicators (5 Minutes)
+</div>
+
+<div class="indicators-grid">
+
+{% for key,value in five_min_result.items() %}
+
+<div class="indicator-card">
+
+    <div class="indicator-name">
+
+        {{ key
+            .replace('_1D','')
+            .replace('_1H','')
+            .replace('_5M','')
+            .replace('_',' ')
+            .replace('[12,26]','')
+        }}
+
+    </div>
+
+    <div
+    class="indicator-value"
+    id="m5-{{ key }}">
+
+        {{ value }}
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endif %}
+
+<!-- =========================
+TIMEFRAME BREAKDOWN
+========================= -->
+
+
+{% if combined_signal and combined_signal.details %}
+{% endif %}
+
+<div class="section-title">
+
+Timeframe Analysis
+
+</div>
+
+<div class="timeframe-grid">
+
+<!-- 1D -->
+
+<div class="tf-card">
+
+    <div class="tf-title">
+
+        📅 1D
+
+    </div>
+
+    <div class="tf-stat">
+
+        <span>Score</span>
+
+        <b id="tf-1D-score">
+        {{ combined_signal.details['1D']['score'] }}
+        </b>
+
+    </div>
+
+    <div class="tf-stat">
+
+        <span>Momentum</span>
+
+        <b id="tf-1D-momentum">
+        {{ combined_signal.details['1D']['momentum'] }}
+        </b>
+
+    </div>
+
+    <div class="tf-stat">
+
+        <span>Trend</span>
+
+        <b id="tf-1D-trend">
+        {{ combined_signal.details['1D']['trend'] }}
+        </b>
+
+    </div>
+
+    <div class="tf-stat">
+
+        <span>Volatility</span>
+
+        <b id="tf-1D-volatility">
+        {{ combined_signal.details['1D']['volatility'] }}
+        </b>
+
+    </div>
+
+    <div class="tf-stat">
+
+        <span>ADX</span>
+
+        <b id="tf-1D-adx">
+        {{ combined_signal.details['1D']['adx'] }}
+        </b>
+
+    </div>
+
+</div>
+
+<!-- 1H -->
+
+{% if combined_signal.details.get('1H') %}
+
+<div class="tf-card">
+
+    <div class="tf-title">
+        ⏱ 1H
+    </div>
+
+    <div class="tf-stat">
+        <span>Score</span>
+        <b id="tf-1H-score">
+        {{ combined_signal.details['1H']['score'] }}
+        </b>
+    </div>
+
+    <div class="tf-stat">
+        <span>Momentum</span>
+        <b id="tf-1H-momentum">
+        {{ combined_signal.details['1H']['momentum'] }}
+        </b>
+    </div>
+
+    <div class="tf-stat">
+        <span>Trend</span>
+        <b id="tf-1H-trend">
+        {{ combined_signal.details['1H']['trend'] }}
+        </b>
+    </div>
+
+    <div class="tf-stat">
+        <span>Volatility</span>
+        <b id="tf-1H-volatility">
+        {{ combined_signal.details['1H']['volatility'] }}
+        </b>
+    </div>
+
+    <div class="tf-stat">
+        <span>ADX</span>
+        <b id="tf-1H-adx">
+        {{ combined_signal.details['1H']['adx'] }}
+        </b>
+    </div>
+
+</div>
+
+{% endif %}
+
+<!-- 5M -->
+
+{% if combined_signal.details.get('5M') %}
+
+<div class="tf-card">
+
+    <div class="tf-title">
+        ⚡ 5M
+    </div>
+
+    <div class="tf-stat">
+        <span>Score</span>
+        <b id="tf-5M-score">
+        {{ combined_signal.details['5M']['score'] }}
+        </b>
+    </div>
+
+    <div class="tf-stat">
+        <span>Momentum</span>
+        <b id="tf-5M-momentum">
+        {{ combined_signal.details['5M']['momentum'] }}
+        </b>
+    </div>
+
+    <div class="tf-stat">
+        <span>Trend</span>
+        <b id="tf-5M-trend">
+        {{ combined_signal.details['5M']['trend'] }}
+        </b>
+    </div>
+
+    <div class="tf-stat">
+        <span>Volatility</span>
+        <b id="tf-5M-volatility">
+        {{ combined_signal.details['5M']['volatility'] }}
+        </b>
+    </div>
+
+    <div class="tf-stat">
+        <span>ADX</span>
+        <b id="tf-5M-adx">
+        {{ combined_signal.details['5M']['adx'] }}
+        </b>
+    </div>
+
+</div>
+
+{% endif %}
+
+</div>
+
+{% endif %}
+
+<footer>
+
+<div>
+Up to 150-day analysis average
+</div>
+
+<div>
+Associated with ChatGPT
+</div>
+
+<div>
+Data provided by Finnhub
+</div>
+
+<div>
+© 2026 All rights reserved
+</div>
+
+</footer>
+
+</div>
+
+<script>
+
+/* =========================
+   LOADER
+========================= */
+
+document.querySelector('form')
+.addEventListener('submit',()=>{
+
+document.getElementById('loader')
+.style.display='flex';
+
+});
+
+
+/* =========================
+   LIVE AI SIGNAL UPDATE
+========================= */
+
+async function refreshSignal(){
+
+    if(document.hidden){
+        return;
+    }
+
+    try{
+
+        const symbol =
+        "{{ stock_data.Symbol if stock_data else '' }}";
+
+        if(!symbol){
+            return;
+        }
+
+        const response =
+        await fetch(`/api/signal/${symbol}`);
+
+        const data =
+        await response.json();
+
+        // PRICE
+        if(data.price !== undefined){
+
+            document.getElementById("price")
+            .innerText =
+            "$" + Number(data.price).toFixed(2);
+
+        }
+
+        // PREVIOUS CLOSE
+        if(data.previous_close !== undefined){
+
+            document.getElementById("previous-close")
+            .innerText =
+            "$" + Number(data.previous_close).toFixed(2);
+
+        }
+
+        // DAY HIGH
+        if(data.day_high !== undefined){
+
+            document.getElementById("day-high")
+            .innerText =
+            "$" + Number(data.day_high).toFixed(2);
+
+        }
+
+        // DAY LOW
+        if(data.day_low !== undefined){
+
+            document.getElementById("day-low")
+            .innerText =
+            "$" + Number(data.day_low).toFixed(2);
+
+        }
+
+        // SIGNAL
+        if(data.signal){
+
+            const signalElement =
+            document.getElementById("signal-text");
+
+            signalElement.innerText =
+            data.signal;
+
+            // reset classes
+            signalElement.classList.remove(
+                "buy",
+                "sell",
+                "neutral"
+            );
+
+           if(data.signal.includes("BUY")){
+
+                signalElement.classList.add("buy");
+
+            }else if(data.signal.includes("SELL")){
+
+                signalElement.classList.add("sell");
+
+            }else{
+
+                signalElement.classList.add("neutral");
+
+            }
+
+        }
+
+        // CONFIDENCE
+        if(data.confidence){
+
+            document.getElementById("confidence-text")
+            .innerText =
+            data.confidence + "%";
+
+            document.getElementById("confidence-bar")
+            .style.width =
+            data.confidence + "%";
+
+            const aiPower =
+            document.getElementById("ai-power-score");
+
+            if(aiPower){
+
+                aiPower.innerHTML =
+                data.score + "<span>/100</span>";
+
+        }
+
+        }
+
+        // MOMENTUM
+        if(data.momentum !== undefined){
+
+            document.getElementById("momentum-text")
+            .innerText =
+            data.momentum;
+
+        }
+
+        // TREND
+        if(data.trend !== undefined){
+
+            document.getElementById("trend-text")
+            .innerText =
+            data.trend;
+
+        }
+
+        // VOLATILITY
+        if(data.volatility !== undefined){
+
+            document.getElementById("volatility-text")
+            .innerText =
+            data.volatility;
+
+        }
+
+// ADX
+        if(data.adx !== undefined){
+
+            document.getElementById("adx-text")
+            .innerText =
+            data.adx + "%";
+
+            const adxBar =
+            document.getElementById("adx-bar");
+
+            if(adxBar){
+
+                adxBar.style.width =
+                data.adx + "%";
+
+        }
+
+        }
+
+        // AGREEMENT
+        if(data.agreement !== undefined){
+
+            document.getElementById("agreement-text")
+            .innerText =
+            data.agreement;
+
+        }
+
+        // MARKET STATE
+        if(data.market_state){
+
+            document.getElementById("market-state-text")
+            .innerText =
+            data.market_state;
+
+        }
+// =========================
+// DAILY INDICATORS
+// =========================
+
+if(data.daily){
+
+    for(const [key,value] of Object.entries(data.daily)){
+
+        const el =
+        document.getElementById(`daily-${key}`);
+
+        if(el && value !== null){
+
+            el.innerText = value;
+
+        }
+
+    }
+
+}
+
+// =========================
+// HOURLY INDICATORS
+// =========================
+
+if(data.hourly){
+
+    for(const [key,value] of Object.entries(data.hourly)){
+
+        const el =
+        document.getElementById(`hourly-${key}`);
+
+        if(el && value !== null){
+
+            el.innerText = value;
+
+        }
+
+    }
+
+}
+
+// =========================
+// 5M INDICATORS
+// =========================
+
+if(data.m5){
+
+    for(const [key,value] of Object.entries(data.m5)){
+
+        const el =
+        document.getElementById(`m5-${key}`);
+
+        if(el && value !== null){
+
+            el.innerText = value;
+
+        }
+
+    }
+
+}
+// =========================
+// TIMEFRAME DETAILS
+// =========================
+
+if(data.details){
+
+    for(const [tf,values] of Object.entries(data.details)){
+
+        for(const [key,val] of Object.entries(values)){
+
+            const el =
+            document.getElementById(
+                `tf-${tf}-${key}`
+            );
+
+            if(el && val !== null){
+
+                el.innerText = val;
+
+            }
+
+        }
+
+    }
+
+}
+
+
+    }catch(err){
+
+    console.log(err);
+
+}
+
+
+}
+
+// כל 30 שניות
+const marketOpen =
+"{{ 'true' if market.is_open else 'false' }}" === "true";
+
+// initial refresh
+refreshSignal();
+
+// auto refresh only when market open
+if(marketOpen){
+
+    setInterval(refreshSignal,30000);
+
+}
+
+
+</script>
+
+</body>
+</html>

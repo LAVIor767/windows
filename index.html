@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>
+    Stock Market Analyzer | Technical Indicators & Market Data
+</title>
+
+<link rel="icon"
+      href="/static/images/favicon.png"
+      type="image/png">
+
+<meta name="description"
+      content="Real-time stock analysis dashboard showing current price, daily high and low, and mathematical indicators based on historical data to predict short and long-term trends.">
+<meta name="robots" content="index, follow">
+<meta name="keywords"
+      content="stocks, stock analysis, technical indicators, stock predictions, market data">
+
+<meta name="author"
+      content="Stock Viewer">
+
+<meta property="og:title"
+      content="Stock Market Analyzer">
+
+<meta property="og:description"
+      content="AI-powered stock analysis dashboard with technical indicators and real-time market data.">
+
+<meta property="og:image"
+      content="{{ url_for('static', filename='images/roulette.jpg', _external=True) }}">
+
+<meta property="og:type"
+      content="website">
+
+<!-- Google Analytics -->
+
+<script async
+src="https://www.googletagmanager.com/gtag/js?id=G-YS2QS3NW3F">
+</script>
+
+<script>
+
+window.dataLayer = window.dataLayer || [];
+
+function gtag(){
+    dataLayer.push(arguments);
+}
+
+gtag('js', new Date());
+
+gtag('config', 'G-YS2QS3NW3F');
+
+</script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#0f172a;
+    color:#e2e8f0;
+    font-family:Arial, sans-serif;
+}
+
+.container{
+    width:95%;
+    max-width:1600px;
+    margin:auto;
+    padding:30px 20px;
+}
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.logo{
+    font-size:38px;
+    font-weight:bold;
+    color:white;
+}
+
+.market-status{
+    font-size:18px;
+    font-weight:bold;
+}
+
+.market-open{
+    color:#22c55e;
+}
+
+.market-closed{
+    color:#ef4444;
+}
+
+/* ===== FORM ===== */
+
+.stock-form{
+    display:flex;
+    gap:15px;
+    margin-bottom:30px;
+}
+
+.stock-form select{
+    flex:1;
+    padding:16px;
+    border:none;
+    border-radius:12px;
+    background:#1e293b;
+    color:white;
+    font-size:16px;
+}
+
+.stock-form button{
+    padding:16px 30px;
+    border:none;
+    border-radius:12px;
+    background:#2563eb;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.stock-form button:hover{
+    background:#1d4ed8;
+}
+
+/* ===== GRID ===== */
+
+.dashboard-grid{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:25px;
+    margin-bottom:25px;
+}
+
+.card{
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 0 25px rgba(0,0,0,0.25);
+    transition:0.25s;
+}
+
+.card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 0 35px rgba(37,99,235,0.20);
+}
+
+/* ===== STOCK CARD ===== */
+
+.stock-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:30px;
+}
+
+.stock-name{
+    font-size:36px;
+    font-weight:bold;
+}
+
+.stock-symbol{
+    color:#94a3b8;
+    font-size:20px;
+}
+
+.stock-price{
+    font-size:72px;
+    font-weight:bold;
+    margin-top:20px;
+}
+
+.stock-change{
+    font-size:26px;
+    margin-top:10px;
+    color:#22c55e;
+}
+
+/* ===== INFO GRID ===== */
+
+.info-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+    margin-top:35px;
+}
+
+.info-box{
+    background:#1e293b;
+    border-radius:14px;
+    padding:18px;
+}
+
+.info-label{
+    color:#94a3b8;
+    margin-bottom:8px;
+}
+
+.info-value{
+    font-size:24px;
+    font-weight:bold;
+}
+
+/* ===== SIGNAL ===== */
+
+.signal-title{
+    text-align:center;
+    font-size:28px;
+    font-weight:bold;
+    margin-bottom:25px;
+}
+
+.buy{
+    color:#22c55e;
+}
+
+.sell{
+    color:#ef4444;
+}
+
+.neutral{
+    color:#facc15;
+}
+
+.score-circle{
+    width:170px;
+    height:170px;
+    border-radius:50%;
+    border:10px solid #22c55e;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin:auto;
+    font-size:42px;
+    font-weight:bold;
+    margin-bottom:25px;
+    transition:0.3s;
+}
+
+.score-circle:hover{
+    transform:scale(1.04);
+}
+
+.buy-border{
+    border-color:#22c55e;
+    box-shadow:0 0 25px rgba(34,197,94,0.45);
+}
+
+.sell-border{
+    border-color:#ef4444;
+    box-shadow:0 0 25px rgba(239,68,68,0.45);
+}
+
+.neutral-border{
+    border-color:#facc15;
+    box-shadow:0 0 25px rgba(250,204,21,0.45);
+}
+
+.progress-block{
+    margin-bottom:20px;
+}
+
+.progress-title{
+    margin-bottom:10px;
+}
+
+.progress{
+    width:100%;
+    height:12px;
+    background:#1e293b;
+    border-radius:999px;
+    overflow:hidden;
+}
+
+.progress-fill{
+    height:100%;
+    background:#22c55e;
+}
+
+/* ===== INDICATORS ===== */
+
+.section-title{
+    font-size:30px;
+    margin-bottom:25px;
+}
+
+.indicators-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.indicator-name{
+    color:#94a3b8;
+    margin-bottom:12px;
+    font-size:15px;
+    line-height:1.4;
+    font-weight:600;
+}
+
+.indicator-value{
+    font-size:38px;
+    font-weight:bold;
+    margin-bottom:10px;
+    letter-spacing:1px;
+}
+
+.indicator-card{
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:18px;
+    padding:20px;
+    transition:0.25s;
+}
+
+.indicator-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 0 25px rgba(37,99,235,0.25);
+}
+
+
+
+.indicator-status{
+    font-size:18px;
+}
+
+.green{
+    color:#22c55e;
+}
+
+.red{
+    color:#ef4444;
+}
+
+.orange{
+    color:#f59e0b;
+}
+
+/* ===== WELCOME IMAGE ===== */
+
+.welcome-image-container{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-top:40px;
+    margin-bottom:40px;
+}
+
+.welcome-image{
+    width:100%;
+    max-width:1100px;
+    border-radius:24px;
+    object-fit:cover;
+    cursor:pointer;
+    transition:0.25s;
+    box-shadow:0 10px 35px rgba(0,0,0,0.35);
+}
+
+.welcome-image:hover{
+    transform:scale(1.02);
+    opacity:0.92;
+}
+
+/* ===== TIMEFRAME ===== */
+
+.timeframe-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:20px;
+}
+
+.timeframe-card{
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:18px;
+    padding:20px;
+}
+
+.timeframe-title{
+    font-size:24px;
+    margin-bottom:20px;
+}
+
+/* ===== FOOTER ===== */
+
+footer{
+    margin-top:50px;
+    text-align:center;
+    color:#94a3b8;
+    padding:30px;
+}
+
+/* ===== MOBILE ===== */
+
+@media(max-width:1000px){
+
+    .dashboard-grid{
+        grid-template-columns:1fr;
+    }
+
+    .stock-price{
+        font-size:52px;
+    }
+
+    .stock-form{
+        flex-direction:column;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- TOP -->
+
+    <div class="topbar">
+
+        <div class="logo">
+            📈 Stocks Analysis Wizard
+        </div>
+
+        <div class="market-status
+            {% if market.is_open %}
+                market-open
+            {% else %}
+                market-closed
+            {% endif %}
+        ">
+
+            {% if market.is_open %}
+                ●
+            {% else %}
+                ○
+            {% endif %}
+
+            {{ market.message }}
+
+        </div>
+
+    </div>
+
+    <!-- FORM -->
+
+    <form method="POST" class="stock-form">
+
+        <select name="stock">
+
+            {% for name, symbol in stocks.items() %}
+                <option value="{{ name }}"
+                    {% if selected_stock == name %}selected{% endif %}>
+                    {{ name }}
+                </option>
+            {% endfor %}
+
+        </select>
+
+        <button type="submit">
+            Analyze Stock
+        </button>
+
+    </form>
+
+    {% if not stock_data %}
+
+    <div class="welcome-image-container">
+
+        <a href="{{ url_for('mavohim') }}">
+
+            <img
+                src="{{ url_for('static', filename='images/roulette.jpg') }}"
+                class="welcome-image"
+                alt="Welcome Banner"
+            >
+
+        </a>
+
+    </div>
+
+    {% endif %}
+
+
+    {% if stock_data %}
+
+    <!-- MAIN GRID -->
+
+    <div class="dashboard-grid">
+
+        <!-- STOCK -->
+
+        <div class="card">
+
+            <div class="stock-header">
+
+                <div>
+
+                    <div class="stock-name">
+                        {{ stock_data.Name }}
+                    </div>
+
+                    <div class="stock-symbol">
+                        {{ stock_data.Symbol }}
+                    </div>
+
+                    <div class="stock-price" id="price">
+                        {{ stock_data.Price }}
+                    </div>
+
+                    <div class="stock-change">
+                        Live Market Data
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="info-grid">
+
+                <div class="info-box">
+                    <div class="info-label">Previous Close</div>
+                    <div class="info-value" id="previous-close">
+                        {{ stock_data['Previous Close'] }}
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-label">Day High</div>
+                    <div class="info-value green" id="day-high">
+                        {{ stock_data['Day High'] }}
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-label">Day Low</div>
+                    <div class="info-value red" id="day-low">
+                        {{ stock_data['Day Low'] }}
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-label">Data Provider</div>
+                    <div class="info-value">
+                        Finnhub
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- SIGNAL -->
+
+        {% if combined_signal %}
+
+        <div class="card">
+
+            <div
+            id="signal-text"
+
+            class="signal-title
+                {% if 'BUY' in combined_signal.signal %}
+                    buy
+                {% elif 'SELL' in combined_signal.signal %}
+                    sell
+                {% else %}
+                    neutral
+                {% endif %}
+            ">
+
+                {{ combined_signal.signal }}
+
+            </div>
+
+            <div id="score-circle"
+            class="score-circle
+            {% if 'BUY' in combined_signal.signal %}
+                buy-border
+            {% elif 'SELL' in combined_signal.signal %}
+                sell-border
+            {% else %}
+                neutral-border
+            {% endif %}
+            ">
+                {{ combined_signal.score }}%
+            </div>
+            <div class="progress-block">
+
+                <div
+                class="progress-title"
+                id="confidence-text">
+
+                    Confidence {{ combined_signal.confidence }}%
+
+                </div>
+
+                <div class="progress">
+                    <div id="confidence-bar"
+                    class="progress-fill"
+                         style="width: {{ combined_signal.confidence }}%;">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="progress-block">
+
+                <div
+                class="progress-title"
+                id="adx-text">
+
+                    ADX {{ combined_signal.adx }}
+
+            </div>
+
+                <div class="progress">
+                    <div id="adx-bar"
+                    class="progress-fill"
+                         style="width: {{ combined_signal.adx }}%;
+                                background:#f59e0b;">
+                    </div>
+                </div>
+
+            </div>
+
+            <br>
+
+            <div id="momentum-text">
+                Momentum: {{ combined_signal.momentum }}
+            </div>
+            <div id="trend-text">
+                Trend: {{ combined_signal.trend }}
+            </div>
+            <div id="volatility-text">
+                Volatility: {{ combined_signal.volatility }}
+            </div>
+            <div id="agreement-text">
+                Agreement: {{ combined_signal.agreement }}
+            </div>
+                        <div id="consensus-text">
+                Consensus: {{ combined_signal.consensus }}
+            </div>
+
+            <br>
+
+            <div id="market-state-text">
+
+                Market State:
+                <b>{{ combined_signal.market_state }}</b>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    <!-- INDICATORS -->
+
+<!-- DAILY -->
+
+    {% if calc_result %}
+
+    <h2 class="section-title">
+        Daily Indicators (1 Day)
+    </h2>
+
+    <div class="indicators-grid" id="daily-grid">
+
+        {% for key, value in calc_result.items() %}
+
+        <div class="indicator-card">
+
+            <div class="indicator-name">
+
+                {{ key
+                    .replace('_1D','')
+                    .replace('_1H','')
+                    .replace('_5M','')
+                    .replace('_',' ')
+                    .replace('[12,26]','')
+                }}
+
+            </div>
+
+            <div class="indicator-value">
+                {{ value }}
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+<!-- HOURLY -->
+
+    {% if hourly_result %}
+
+    <br><br>
+
+    <h2 class="section-title">
+        Intraday Indicators (1 Hour)
+    </h2>
+
+    <div class="indicators-grid" id="hourly-grid">
+
+        {% for key, value in hourly_result.items() %}
+
+        <div class="indicator-card">
+
+            <div class="indicator-name">
+
+                {{ key
+                    .replace('_1D','')
+                    .replace('_1H','')
+                    .replace('_5M','')
+                    .replace('_',' ')
+                    .replace('[12,26]','')
+                }}
+
+            </div>
+
+            <div class="indicator-value">
+                {{ value }}
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+<!-- 5 MIN -->
+
+    {% if five_min_result %}
+
+    <br><br>
+
+    <h2 class="section-title">
+        Indicators (5 Minutes)
+    </h2>
+
+    <div class="indicators-grid" id="m5-grid">
+
+        {% for key, value in five_min_result.items() %}
+
+        <div class="indicator-card">
+
+            <div class="indicator-name">
+
+                {{ key
+                    .replace('_1D','')
+                    .replace('_1H','')
+                    .replace('_5M','')
+                    .replace('_',' ')
+                    .replace('[12,26]','')
+                }}
+
+            </div>
+
+            <div class="indicator-value">
+                {{ value }}
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- TIMEFRAME -->
+
+    {% if combined_signal %}
+
+    <br><br>
+
+    <h2 class="section-title">
+        Timeframe Breakdown
+    </h2>
+
+    <div class="timeframe-grid" id="timeframe-grid">
+
+        {% for tf, d in combined_signal.details.items() %}
+
+        <div class="timeframe-card">
+
+            <div class="timeframe-title">
+                {{ tf }}
+            </div>
+
+            <div>Score: {{ d.score }}</div>
+            <div>Momentum: {{ d.momentum }}</div>
+            <div>Trend: {{ d.trend }}</div>
+            <div>Volatility: {{ d.volatility }}</div>
+            <div>ADX: {{ d.adx }}</div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+    {% endif %}
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>Up to 150-day analysis average</p>
+        <p>Associated with ChatGPT</p>
+        <p>Data provided by Finnhub</p>
+        <p>© 2026 All rights reserved</p>
+
+    </footer>
+
+</div>
+
+<!-- LIVE AI UPDATE -->
+
+<script>
+
+{% if stock_data %}
+
+function renderIndicators(gridId, indicators){
+
+    const grid =
+    document.getElementById(gridId);
+
+    if(!grid || !indicators){
+        return;
+    }
+
+    let html = "";
+
+    Object.entries(indicators).forEach(([key,value]) => {
+
+        const cleanName = key
+            .replace("_1D","")
+            .replace("_1H","")
+            .replace("_5M","")
+            .replaceAll("_"," ")
+            .replace("[12,26]","");
+
+        html += `
+        <div class="indicator-card">
+
+            <div class="indicator-name">
+                ${cleanName}
+            </div>
+
+            <div class="indicator-value">
+                ${value}
+            </div>
+
+        </div>
+        `;
+    });
+
+    grid.innerHTML = html;
+}
+
+function renderTimeframes(details){
+
+    const grid =
+    document.getElementById("timeframe-grid");
+
+    if(!grid || !details){
+        return;
+    }
+
+    let html = "";
+
+    Object.entries(details).forEach(([tf,d]) => {
+
+        html += `
+        <div class="timeframe-card">
+
+            <div class="timeframe-title">
+                ${tf}
+            </div>
+
+            <div>Score: ${d.score}</div>
+            <div>Momentum: ${d.momentum}</div>
+            <div>Trend: ${d.trend}</div>
+            <div>Volatility: ${d.volatility}</div>
+            <div>ADX: ${d.adx}</div>
+
+        </div>
+        `;
+    });
+
+    grid.innerHTML = html;
+}
+
+async function refreshSignal(){
+
+    if(document.hidden){
+        return;
+    }
+
+    try{
+
+        const response =
+        await fetch("/api/signal/{{ stock_data.Symbol }}");
+
+        const data =
+        await response.json();
+
+        // DAILY
+        if(data.daily){
+
+        renderIndicators(
+            "daily-grid",
+            data.daily
+        );
+
+        }
+
+        // HOURLY
+        if(data.hourly){
+
+        renderIndicators(
+            "hourly-grid",
+            data.hourly
+        );
+
+        }
+
+        // 5M
+        if(data.m5){
+
+        renderIndicators(
+            "m5-grid",
+            data.m5
+        );
+
+        }
+
+        // TIMEFRAMES
+        if(data.details){
+
+        renderTimeframes(
+            data.details
+        );
+
+        }
+
+        // PRICE
+        if(data.price){
+
+            document.getElementById("price").innerText =
+            Number(data.price).toFixed(2);
+
+        }
+
+        // PREVIOUS CLOSE
+        if(data.previous_close){
+
+            document.getElementById("previous-close")
+            .innerText =
+            "$" + Number(data.previous_close).toFixed(2);
+
+        }
+
+        // DAY HIGH
+        if(data.day_high){
+
+            document.getElementById("day-high")
+            .innerText =
+            "$" + Number(data.day_high).toFixed(2);
+
+        }
+
+        // DAY LOW
+        if(data.day_low){
+
+            document.getElementById("day-low")
+            .innerText =
+            "$" + Number(data.day_low).toFixed(2);
+
+        }
+
+        // SIGNAL
+
+// SIGNAL
+        if(data.signal){
+
+            const signalEl =
+            document.getElementById("signal-text");
+
+            // update text
+            signalEl.innerText =
+            data.signal;
+
+            // remove old classes
+            signalEl.classList.remove(
+                "buy",
+                "sell",
+                "neutral"
+            );
+
+    // add new class
+            if(data.signal.includes("BUY")){
+
+                signalEl.classList.add("buy");
+
+            }else if(data.signal.includes("SELL")){
+
+                signalEl.classList.add("sell");
+
+            }else{
+
+                signalEl.classList.add("neutral");
+
+            }
+
+        }
+
+// SCORE
+
+        if(data.score !== undefined){
+
+            const scoreEl =
+            document.getElementById("score-circle");
+
+    // update score text
+            scoreEl.innerText =
+            data.score + "%";
+
+    // remove old border classes
+            scoreEl.classList.remove(
+                "buy-border",
+                "sell-border",
+                "neutral-border"
+            );
+
+    // add new border class
+            if(data.signal &&
+                data.signal.includes("BUY")){
+
+                scoreEl.classList.add(
+                    "buy-border"
+                );
+
+            }else if(
+                data.signal &&
+                data.signal.includes("SELL")
+            ){
+
+                scoreEl.classList.add(
+                    "sell-border"
+                );
+
+            }else{
+
+                scoreEl.classList.add(
+                    "neutral-border"
+                );
+
+            }
+
+        }
+
+// CONFIDENCE
+        if(data.confidence !== undefined){
+
+            document.getElementById(
+                "confidence-text"
+            ).innerText =
+            "Confidence " + data.confidence + "%";
+
+            document.getElementById(
+                "confidence-bar"
+            ).style.width =
+            data.confidence + "%";
+
+        }
+
+        // ADX
+
+        if(data.adx !== undefined){
+
+            document.getElementById(
+                "adx-text"
+            ).innerText =
+            "ADX " + data.adx;
+
+            document.getElementById(
+                "adx-bar"
+            ).style.width =
+            data.adx + "%";
+
+        }
+
+        // MOMENTUM
+        if(data.momentum !== undefined){
+
+            document.getElementById("momentum-text")
+            .innerText =
+            "Momentum: " + data.momentum;
+
+        }
+
+        // TREND
+        if(data.trend !== undefined){
+
+            document.getElementById("trend-text")
+            .innerText =
+            "Trend: " + data.trend;
+
+        }
+
+        // VOLATILITY
+        if(data.volatility !== undefined){
+
+            document.getElementById("volatility-text")
+            .innerText =
+            "Volatility: " + data.volatility;
+
+        }
+
+        // AGREEMENT
+        if(data.agreement !== undefined){
+
+            document.getElementById("agreement-text")
+            .innerText =
+            "Agreement: " + data.agreement;
+
+        }
+
+        // MARKET STATE
+        if(data.market_state){
+
+            document.getElementById("market-state-text")
+            .innerHTML =
+            "Market State: <b>" +
+            data.market_state +
+            "</b>";
+
+        }
+
+    }catch(e){
+
+        console.log(e);
+
+    }
+
+}
+
+// refresh every 30 sec
+const marketOpen =
+"{{ 'true' if market.is_open else 'false' }}" === "true";
+
+// initial refresh
+refreshSignal();
+
+// auto refresh only when market open
+if(marketOpen){
+
+    setInterval(refreshSignal,30000);
+
+}
+
+{% endif %}
+
+</script>
+
+</body>
+</html>
