@@ -1,8 +1,9 @@
-flask
+Flask
+gunicorn
 pandas
 numpy
 requests
 pytz
 finnhub-python
 pandas-market-calendars
-gunicorn
+urllib3
